@@ -43,6 +43,8 @@ nav{position:sticky; top:0; z-index:50; background:rgba(246,239,234,0.92); backd
 nav .wrap{display:flex; align-items:center; justify-content:space-between; padding:18px 32px;}
 .brand{display:flex; align-items:center; gap:10px; font-family:'Fraunces', serif; font-size:1.2rem; font-weight:500;}
 .brand svg{width:26px; height:26px; flex-shrink:0;}
+.brand-link{background:none; border:none; padding:0; color:var(--parchment); cursor:pointer; transition:opacity 0.15s ease;}
+.brand-link:hover{opacity:0.75;}
 .navlinks{display:flex; gap:26px; list-style:none;}
 .navlinks button{background:none; border:none; cursor:pointer; color:var(--parchment-dim); font-size:0.95rem; font-weight:500; font-family:'Work Sans', sans-serif; padding:0;}
 .navlinks button:hover, .navlinks button.active{color:var(--brass);}
@@ -147,10 +149,10 @@ footer p{font-size:0.85rem;}
 
 <nav>
   <div class="wrap">
-    <div class="brand">
+    <button class="brand brand-link" onclick="goTo('home')" aria-label="Go to home page">
       <svg viewBox="0 0 24 24" fill="none"><circle cx="7" cy="12" r="4" stroke="#A6791F" stroke-width="1.6"/><line x1="11" y1="12" x2="20" y2="12" stroke="#A6791F" stroke-width="1.6" stroke-linecap="round"/><line x1="16" y1="12" x2="16" y2="16" stroke="#A6791F" stroke-width="1.6" stroke-linecap="round"/><line x1="19" y1="12" x2="19" y2="15" stroke="#A6791F" stroke-width="1.6" stroke-linecap="round"/></svg>
       The Grant Key
-    </div>
+    </button>
     <button class="menu-btn" onclick="document.getElementById('navlinks').classList.toggle('open')">☰</button>
     <ul class="navlinks" id="navlinks">
       <li><button class="navbtn active" data-page="home" onclick="goTo('home')">Home</button></li>
