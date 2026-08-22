@@ -58,7 +58,8 @@ nav .wrap{display:flex; align-items:center; justify-content:space-between; paddi
 .mission p{font-size:1.25rem; color:var(--parchment); font-family:'Fraunces', serif; font-style:italic; font-weight:500; line-height:1.5;}
 
 .about-wrap{display:flex; gap:56px; align-items:flex-start;}
-.avatar{width:120px; height:120px; border-radius:50%; flex-shrink:0; background:var(--vault-3); border:1px solid var(--brass); display:flex; align-items:center; justify-content:center; font-family:'Fraunces', serif; font-size:2rem; color:var(--brass);}
+.avatar{width:120px; height:120px; border-radius:50%; flex-shrink:0; background:var(--vault-3); border:1px solid var(--brass); display:flex; align-items:center; justify-content:center; font-family:'Fraunces', serif; font-size:2rem; color:var(--brass); overflow:hidden;}
+.avatar img{width:100%; height:100%; object-fit:cover; object-position:center;}
 .about-copy{flex:1;}
 .trust-note{margin-top:22px; padding:16px 20px; background:var(--vault-2); border-left:2px solid var(--moss); font-size:0.95rem; color:var(--parchment-dim);}
 
@@ -258,7 +259,7 @@ footer p{font-size:0.85rem;}
   </div>
   <section>
     <div class="wrap about-wrap">
-      <div class="avatar">A</div>
+      <div class="avatar"><img src="artemis-avatar.jpg" alt="Artemis"></div>
       <div class="about-copy">
         <p>Hello — I'm Artemis, a high school student based in Irvine. I started The Grant Key because I kept hearing the same thing from women running small businesses near me: there's funding out there, but nobody has time to find it. So I do the research part — matching businesses to grants they're actually eligible for, and helping put a strong application together.</p>
         <div class="trust-note">
