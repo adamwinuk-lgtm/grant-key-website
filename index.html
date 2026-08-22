@@ -109,16 +109,6 @@ nav .wrap{display:flex; align-items:center; justify-content:space-between; paddi
 .ask-item h3{color:var(--brass); font-size:1.05rem; margin-bottom:6px;}
 .ask-item p{font-size:0.95rem;}
 
-.progress-box{background:var(--vault-2); border-radius:var(--radius); padding:40px; border:0.5px solid var(--vault-3); text-align:center; margin-top:16px;}
-.progress-figure{font-family:'Fraunces', serif; font-size:3rem; font-weight:600; color:var(--brass);}
-.progress-goal{color:var(--parchment-dim); font-size:1rem; margin-bottom:22px;}
-.bar-track{width:100%; height:10px; background:var(--vault-3); border-radius:999px; overflow:hidden;}
-.bar-fill{height:100%; width:0%; background:var(--brass); border-radius:999px; transition:width 1.4s ease;}
-.progress-note{margin-top:18px; font-size:0.9rem;}
-
-.stories-box{background:var(--vault-2); border:1px dashed var(--vault-3); border-radius:var(--radius); padding:44px; text-align:center; margin-top:36px;}
-.stories-box h3{color:var(--brass); margin-bottom:10px;}
-
 .catch-box{background:var(--vault-2); border-radius:var(--radius); padding:44px; border-left:3px solid var(--rust); margin-top:12px;}
 .catch-box h3{color:var(--rust); font-family:'Fraunces', serif; font-size:1.4rem; margin-bottom:16px;}
 
@@ -129,6 +119,18 @@ nav .wrap{display:flex; align-items:center; justify-content:space-between; paddi
 .contact-box{background:var(--vault-2); border-radius:var(--radius); padding:48px; text-align:center; margin-top:16px;}
 .contact-links{margin-top:26px;}
 
+.contact-form{text-align:left; margin-top:32px;}
+.form-row{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.form-group{margin-bottom:18px;}
+.form-group label{display:block; font-weight:500; font-size:0.9rem; margin-bottom:6px; color:var(--parchment);}
+.form-group input, .form-group select, .form-group textarea{width:100%; padding:11px 14px; border-radius:8px; border:1px solid var(--vault-3); background:var(--vault); font-family:'Work Sans', sans-serif; font-size:0.95rem; color:var(--parchment);}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus{outline:none; border-color:var(--brass);}
+.form-group textarea{resize:vertical; min-height:80px;}
+.form-status{margin-top:16px; font-size:0.95rem; min-height:1.2em;}
+.form-status.success{color:var(--moss);}
+.form-status.error{color:var(--rust);}
+.contact-links-secondary{margin-top:22px; font-size:0.9rem;}
+
 footer{padding:40px 0; border-top:0.5px solid var(--vault-3); text-align:center;}
 footer .brand{justify-content:center; margin-bottom:10px;}
 footer p{font-size:0.85rem;}
@@ -138,6 +140,7 @@ footer p{font-size:0.85rem;}
   .steps{grid-template-columns:1fr;}
   .grants{grid-template-columns:1fr;}
   .fund-grid{grid-template-columns:1fr;}
+  .form-row{grid-template-columns:1fr;}
   .navlinks{position:absolute; top:100%; left:0; right:0; flex-direction:column; background:var(--vault); padding:20px 32px; gap:16px; border-bottom:0.5px solid var(--vault-3); display:none;}
   .navlinks.open{display:flex;}
   .menu-btn{display:block;}
@@ -160,7 +163,6 @@ footer p{font-size:0.85rem;}
       <li><button class="navbtn" data-page="about" onclick="goTo('about')">About Me</button></li>
       <li><button class="navbtn" data-page="resources" onclick="goTo('resources')">Grant Resources</button></li>
       <li><button class="navbtn" data-page="catch" onclick="goTo('catch')">The Catch</button></li>
-      <li><button class="navbtn" data-page="progress" onclick="goTo('progress')">Progress</button></li>
       <li><button class="navbtn" data-page="contact" onclick="goTo('contact')">Get In Touch</button></li>
     </ul>
   </div>
@@ -452,35 +454,6 @@ footer p{font-size:0.85rem;}
   </section>
 </div>
 
-<!-- PROGRESS -->
-<div class="page" data-page="progress">
-  <div class="page-header">
-    <div class="wrap">
-      <span class="eyebrow">Progress</span>
-      <h1>How It's Going So Far</h1>
-    </div>
-  </div>
-  <section class="tight">
-    <div class="wrap">
-      <div class="progress-box">
-        <div class="progress-figure" id="dollarFigure">$0</div>
-        <div class="progress-goal">unlocked so far — goal: $25,000 for local women-owned businesses</div>
-        <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
-        <p class="progress-note">Just getting started. This number updates as real businesses get real funding — check back.</p>
-      </div>
-    </div>
-  </section>
-  <section class="tight">
-    <div class="wrap">
-      <h2>Success Stories</h2>
-      <div class="stories-box">
-        <h3>Coming Soon</h3>
-        <p>I'd rather show you real results later than made-up ones now. Once businesses I've worked with are comfortable sharing, their stories will go here.</p>
-      </div>
-    </div>
-  </section>
-</div>
-
 <!-- CONTACT -->
 <div class="page" data-page="contact">
   <div class="page-header">
@@ -493,9 +466,89 @@ footer p{font-size:0.85rem;}
     <div class="wrap">
       <div class="contact-box">
         <p>Tell me a bit about your business and I'll follow up with grants you're likely eligible for — usually within a few days.</p>
-        <div class="contact-links">
-          <a href="mailto:hello@thegrantkey.com" class="btn">Email hello@thegrantkey.com</a>
-        </div>
+
+        <form class="contact-form" id="contactForm" action="https://formspree.io/f/REPLACE_WITH_YOUR_FORM_ID" method="POST" onsubmit="return submitContactForm(event)">
+          <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+          <input type="hidden" name="_subject" value="New Grant Key inquiry">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cf-name">Your Name *</label>
+              <input type="text" id="cf-name" name="Your Name" required>
+            </div>
+            <div class="form-group">
+              <label for="cf-email">Your Email *</label>
+              <input type="email" id="cf-email" name="Your Email" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cf-business">Business Name *</label>
+              <input type="text" id="cf-business" name="Business Name" required>
+            </div>
+            <div class="form-group">
+              <label for="cf-industry">Industry / Type Of Business *</label>
+              <input type="text" id="cf-industry" name="Industry" required placeholder="e.g. bakery, salon, consulting">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cf-location">City &amp; State *</label>
+              <input type="text" id="cf-location" name="Location" required placeholder="e.g. Irvine, CA">
+            </div>
+            <div class="form-group">
+              <label for="cf-length">How Long Have You Owned It? *</label>
+              <select id="cf-length" name="Time In Business" required>
+                <option value="" disabled selected>Select one</option>
+                <option>Under 6 months</option>
+                <option>6–12 months</option>
+                <option>1–3 years</option>
+                <option>3+ years</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cf-goal">What Are You Hoping Grant Funding Helps You Do? *</label>
+            <textarea id="cf-goal" name="Goal" required placeholder="e.g. buy equipment, cover a storefront renovation, hire help..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cf-revenue">Rough Annual Revenue</label>
+              <select id="cf-revenue" name="Revenue">
+                <option value="" selected>Prefer not to say</option>
+                <option>Pre-revenue / just starting</option>
+                <option>Under $25,000</option>
+                <option>$25,000–$100,000</option>
+                <option>$100,000–$500,000</option>
+                <option>$500,000+</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="cf-women">At Least 50% Women-Owned?</label>
+              <select id="cf-women" name="Women-Owned">
+                <option value="" selected>Not sure</option>
+                <option>Yes</option>
+                <option>No</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cf-more">Anything Else? (Your Story, Other Details)</label>
+            <textarea id="cf-more" name="More Info" placeholder="Optional"></textarea>
+          </div>
+
+          <div style="text-align:center; margin-top:8px;">
+            <button type="submit" class="btn" id="cf-submit">Send My Info</button>
+          </div>
+          <p class="form-status" id="cf-status" role="status"></p>
+        </form>
+
+        <p class="contact-links-secondary">Prefer email? Reach me directly at <a href="mailto:hello@thegrantkey.com">hello@thegrantkey.com</a></p>
       </div>
     </div>
   </section>
@@ -512,9 +565,6 @@ footer p{font-size:0.85rem;}
 </footer>
 
 <script>
-  var unlocked = 0, goal = 25000;
-  document.getElementById('dollarFigure').textContent = '$' + unlocked.toLocaleString();
-
   function goTo(pageName){
     document.querySelectorAll('.page').forEach(function(p){
       p.classList.toggle('active', p.getAttribute('data-page') === pageName);
@@ -524,10 +574,41 @@ footer p{font-size:0.85rem;}
     });
     document.getElementById('navlinks').classList.remove('open');
     window.scrollTo(0, 0);
-    if(pageName === 'progress'){
-      document.getElementById('barFill').style.width = Math.min(100, (unlocked/goal)*100) + '%';
-    }
     initReveal();
+  }
+
+  function submitContactForm(event){
+    event.preventDefault();
+    var form = document.getElementById('contactForm');
+    var status = document.getElementById('cf-status');
+    var submitBtn = document.getElementById('cf-submit');
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+    status.textContent = '';
+    status.className = 'form-status';
+
+    fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: {'Accept': 'application/json'}
+    }).then(function(res){
+      if(res.ok){
+        status.textContent = "Thanks — I've got your info and will follow up within a few days.";
+        status.className = 'form-status success';
+        form.reset();
+      } else {
+        throw new Error('submission failed');
+      }
+    }).catch(function(){
+      status.textContent = 'Something went wrong sending that — please email hello@thegrantkey.com directly instead.';
+      status.className = 'form-status error';
+    }).finally(function(){
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send My Info';
+    });
+
+    return false;
   }
 
   var revealObserver = new IntersectionObserver(function(entries){
@@ -540,7 +621,7 @@ footer p{font-size:0.85rem;}
   }, {threshold:0.15});
 
   function initReveal(){
-    var selector = '.step-card, .grant-card, .ask-item, .fund-col, .catch-box, .progress-box, .stories-box, .alert-box, .contact-box, .local-note, .about-wrap, .trust-note';
+    var selector = '.step-card, .grant-card, .ask-item, .fund-col, .catch-box, .alert-box, .contact-box, .local-note, .about-wrap, .trust-note';
     document.querySelector('.page.active').querySelectorAll(selector).forEach(function(el){
       if(!el.classList.contains('reveal')){
         el.classList.add('reveal');
