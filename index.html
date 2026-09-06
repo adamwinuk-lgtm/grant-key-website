@@ -504,9 +504,22 @@ footer p{font-size:0.85rem;}
   <section class="tight">
     <div class="wrap">
       <div class="contact-box">
+        <p>The intake form is temporarily offline while I finish setting it up securely. Please check back soon — thanks for your patience.</p>
+      </div>
+
+      <!--
+        CONTACT FORM — TEMPORARILY DISABLED.
+        The form backend (Formspree) and the hello@thegrantkey.com inbox are not
+        set up yet, so the form is parked in this inert <template> and collects
+        nothing. To re-enable: (1) delete the holding <p> and its </div> above,
+        (2) remove this comment and the <template ...> / </template> wrapper lines,
+        (3) put the intro <p>, the form, and the email line back inside
+        <div class="contact-box">, (4) replace YOUR_FORM_ID with the real
+        Formspree form ID. See SECURITY.md for the full re-enable checklist.
+      -->
+      <template id="contactFormMarkup">
         <p>Tell me a bit about your business and I'll follow up with grants you're likely eligible for — usually within a few days.</p>
 
-        <!-- action: replace YOUR_FORM_ID with the real Formspree form ID before this goes live -->
         <form class="contact-form" id="contactForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
           <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
           <input type="hidden" name="_subject" value="New Grant Key inquiry">
@@ -594,7 +607,7 @@ footer p{font-size:0.85rem;}
         </form>
 
         <p class="contact-links-secondary">Prefer email? Reach me directly at <a href="mailto:hello@thegrantkey.com">hello@thegrantkey.com</a></p>
-      </div>
+      </template>
     </div>
   </section>
 </div>
@@ -618,7 +631,7 @@ footer p{font-size:0.85rem;}
         </div>
         <div class="ask-item">
           <h3>What I collect</h3>
-          <p>Only what you type into the contact form: your name, email, business name, industry, city and state, how long you've owned the business, what you're hoping funding helps with, and — optionally — rough revenue, women-owned status, and anything else you choose to share. There are no analytics or advertising trackers on this site.</p>
+          <p><strong>The contact form is switched off right now, so no form data is being collected.</strong> When it's active, it collects only what you type into it: your name, email, business name, industry, city and state, how long you've owned the business, what you're hoping funding helps with, and — optionally — rough revenue, women-owned status, and anything else you choose to share. There are no analytics or advertising trackers on this site.</p>
         </div>
         <div class="ask-item">
           <h3>How the form works</h3>
