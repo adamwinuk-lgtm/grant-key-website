@@ -16,6 +16,15 @@
     if (navlinks) { navlinks.classList.remove('open'); }
     window.scrollTo(0, 0);
     initReveal();
+    if (pageName === 'contact') { ensureTurnstile(); }
+  }
+
+  // The contact page starts hidden, so the Turnstile widget may not have
+  // rendered on load. Render it the first time the page is shown.
+  function ensureTurnstile() {
+    var el = document.querySelector('.cf-turnstile');
+    if (!el || !window.turnstile || el.querySelector('iframe')) { return; }
+    try { window.turnstile.render(el); } catch (e) { /* implicit render already handled it */ }
   }
 
   var revealObserver = new IntersectionObserver(function (entries) {
@@ -37,18 +46,17 @@
     });
   }
 
+  function resetTurnstile() {
+    if (window.turnstile && typeof window.turnstile.reset === 'function') {
+      try { window.turnstile.reset(); } catch (e) { /* ignore */ }
+    }
+  }
+
   function submitContactForm(event) {
     event.preventDefault();
     var form = document.getElementById('contactForm');
     var status = document.getElementById('cf-status');
     var submitBtn = document.getElementById('cf-submit');
-
-    // Guard against submitting to the unconfigured placeholder endpoint.
-    if (!form.action || form.action.indexOf('YOUR_FORM_ID') !== -1) {
-      status.textContent = 'This form isn’t connected yet — please email hello@thegrantkey.com directly.';
-      status.className = 'form-status error';
-      return;
-    }
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Sending…';
@@ -60,12 +68,23 @@
       body: new FormData(form),
       headers: { 'Accept': 'application/json' }
     }).then(function (res) {
-      if (res.ok) {
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        return { ok: res.ok && data.ok === true, error: data.error };
+      });
+    }).then(function (result) {
+      if (result.ok) {
         status.textContent = "Thanks — I've got your info and will follow up within a few days.";
         status.className = 'form-status success';
         form.reset();
+      } else if (result.error === 'challenge_failed') {
+        status.textContent = 'Please complete the anti-spam check above and try again.';
+        status.className = 'form-status error';
+      } else if (result.error === 'missing_fields' || result.error === 'bad_email') {
+        status.textContent = 'Please check the required fields and try again.';
+        status.className = 'form-status error';
       } else {
-        throw new Error('submission failed');
+        status.textContent = 'Something went wrong sending that — please email hello@thegrantkey.com directly instead.';
+        status.className = 'form-status error';
       }
     }).catch(function () {
       status.textContent = 'Something went wrong sending that — please email hello@thegrantkey.com directly instead.';
@@ -73,6 +92,7 @@
     }).finally(function () {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Unlock My Grant Matches';
+      resetTurnstile();
     });
   }
 
