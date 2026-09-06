@@ -13,10 +13,11 @@ one-person student project; expect a reply within a few days.
   **Cloudflare** at `thegrantkey.com`.
 - The contact form is **currently disabled** — its markup is parked in an inert
   `<template>` in `index.html` and collects nothing. When re-enabled it will post
-  to **Formspree**, which emails submissions to `hello@thegrantkey.com`.
+  same-origin to a Cloudflare Worker (`worker/`) that emails submissions to a
+  verified address via Email Routing (see "Contact form backend" below).
 
-The real risk is takeover of the GitHub, Cloudflare, registrar, or Formspree
-accounts — not code injection. The checklist below reflects that.
+The real risk is takeover of the GitHub or Cloudflare account (Cloudflare also
+holds the registrar and DNS) — not code injection. The checklist reflects that.
 
 ## In-repo controls (done in this repo)
 
@@ -33,8 +34,8 @@ accounts — not code injection. The checklist below reflects that.
       Privacy Policy page notes this.
 - [x] Form markup keeps a required consent checkbox and a honeypot (`_gotcha`)
       for when it is re-enabled.
-- [ ] Before re-enabling: work through the **Formspree** section below and
-      replace `YOUR_FORM_ID` in the form `action` with the real form ID.
+- [ ] Before re-enabling: deploy the Worker and wire the form to it — see
+      "Contact form backend" below.
 
 ## Cloudflare (edge)
 
@@ -86,12 +87,26 @@ accounts — not code injection. The checklist below reflects that.
 - [ ] Keep the Pages site enabled — deleting the repo while Cloudflare still
       points at GitHub opens a subdomain-takeover window.
 
-## Formspree
+## Contact form backend
 
-- [ ] Real form endpoint configured (see in-repo checklist).
-- [ ] hCaptcha or reCAPTCHA enabled on the form, or Cloudflare Turnstile.
-- [ ] 2FA on the Formspree account (submissions contain personal data).
-- [ ] Accept Formspree's DPA; set a submission retention limit.
+Formspree is **not** being used. The replacement is an in-house Cloudflare
+Worker (`worker/`) on `thegrantkey.com/api/contact` — same origin, so the
+zone's WAF + rate-limit rules apply, and nothing is stored or sent to a third
+party. Spam is filtered by Cloudflare Turnstile + a honeypot.
+
+- [x] Worker written (`worker/src/index.js`) — origin check, honeypot,
+      Turnstile verification, field validation + size caps, one plain-text
+      email via the Email Routing `send_email` binding.
+- [x] **Deployed** — `grantkey-contact` on route `thegrantkey.com/api/contact`.
+      Turnstile widget created (Managed). `TURNSTILE_SECRET` and `CONTACT_TO`
+      (verified Email Routing address) held as Worker secrets, not in the repo;
+      the `send_email` binding is left unrestricted so no address is committed.
+      Behaviour verified against the live route (405 / 403 / 400 for the reject
+      paths; end-to-end send confirmed with a Turnstile test key, then the real
+      key restored).
+- [ ] Re-enable the form (un-park the `<template>`), point it at `/api/contact`,
+      add the Turnstile widget with the site key, update CSP
+      (`+challenges.cloudflare.com`, `-formspree.io`).
 
 ## History note
 

@@ -1,0 +1,16 @@
+{
+  "name": "grantkey-contact-worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "mimetext": "3.0.16"
+  },
+  "devDependencies": {
+    "wrangler": "4.129.0"
+  }
+}
