@@ -6,15 +6,15 @@
  * Flow: same-origin check -> honeypot -> Cloudflare Turnstile -> validate ->
  *       send one plain-text email via Email Routing. Nothing is stored.
  *
- * Bindings / vars (see wrangler.toml + README.md):
- *   CONTACT_EMAIL     send_email binding
- *   TURNSTILE_SECRET  secret  (wrangler secret put TURNSTILE_SECRET)
- *   FROM_ADDRESS      var     e.g. form@thegrantkey.com
- *   CONTACT_TO        var     a VERIFIED Email Routing destination address
+ * Bindings (see wrangler.toml + README.md):
+ *   CONTACT_EMAIL     send_email binding (Email Routing)
+ *   FROM_ADDRESS      var      e.g. form@thegrantkey.com
+ *   TURNSTILE_SECRET  secret   Turnstile secret key
+ *   CONTACT_TO        secret   a VERIFIED Email Routing destination address
  */
 
 import { EmailMessage } from "cloudflare:email";
-import { createMimeMessage } from "mimetext";
+import { createMimeMessage, Mailbox } from "mimetext";
 
 const ALLOWED_HOST = "thegrantkey.com";
 const MAX_FIELD = 5000; // per-field character cap
@@ -68,89 +68,98 @@ async function verifyTurnstile(token, ip, secret) {
 
 export default {
   async fetch(request, env) {
-    if (request.method !== "POST") {
-      return json(405, { ok: false, error: "method_not_allowed" });
-    }
-    if (!sameOrigin(request)) {
-      return json(403, { ok: false, error: "bad_origin" });
-    }
-
-    let form;
     try {
-      form = await request.formData();
-    } catch {
-      return json(400, { ok: false, error: "bad_request" });
+      return await handle(request, env);
+    } catch (err) {
+      console.error("unhandled:", err && (err.stack || err.message || err));
+      return json(500, { ok: false, error: "server_error" });
     }
+  },
+};
 
-    // Honeypot: a real browser leaves this empty. Bots fill it. Drop silently.
-    if ((form.get("_gotcha") || "").toString().trim() !== "") {
-      return json(200, { ok: true });
-    }
+async function handle(request, env) {
+  if (request.method !== "POST") {
+    return json(405, { ok: false, error: "method_not_allowed" });
+  }
+  if (!sameOrigin(request)) {
+    return json(403, { ok: false, error: "bad_origin" });
+  }
 
-    const ip = request.headers.get("CF-Connecting-IP") || "";
-    const passed = await verifyTurnstile(
-      form.get("cf-turnstile-response"),
-      ip,
-      env.TURNSTILE_SECRET,
-    );
-    if (!passed) {
-      return json(400, { ok: false, error: "challenge_failed" });
-    }
+  let form;
+  try {
+    form = await request.formData();
+  } catch {
+    return json(400, { ok: false, error: "bad_request" });
+  }
 
-    // Collect, trim, cap.
-    const data = {};
-    let total = 0;
-    for (const key of [...REQUIRED, ...OPTIONAL]) {
-      let v = (form.get(key) ?? "").toString().trim();
-      if (v.length > MAX_FIELD) v = v.slice(0, MAX_FIELD);
-      total += v.length;
-      data[key] = v;
-    }
-    if (total > MAX_TOTAL) {
-      return json(413, { ok: false, error: "too_large" });
-    }
-    for (const key of REQUIRED) {
-      if (!data[key]) return json(422, { ok: false, error: "missing_fields" });
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data["Your Email"])) {
-      return json(422, { ok: false, error: "bad_email" });
-    }
+  // Honeypot: a real browser leaves this empty. Bots fill it. Drop silently.
+  if ((form.get("_gotcha") || "").toString().trim() !== "") {
+    return json(200, { ok: true });
+  }
 
-    const bodyText = [
-      `Name:             ${data["Your Name"]}`,
-      `Email:            ${data["Your Email"]}`,
-      `Business:         ${data["Business Name"]}`,
-      `Industry:         ${data["Industry"]}`,
-      `Location:         ${data["Location"]}`,
-      `Time in business: ${data["Time In Business"]}`,
-      `Revenue:          ${data["Revenue"] || "—"}`,
-      `Women-owned:      ${data["Women-Owned"] || "—"}`,
-      "",
-      "Goal:",
-      data["Goal"],
-      "",
-      "Anything else:",
-      data["More Info"] || "—",
-      "",
-      "— submitted via the thegrantkey.com contact form",
-    ].join("\n");
+  const ip = request.headers.get("CF-Connecting-IP") || "";
+  const passed = await verifyTurnstile(
+    form.get("cf-turnstile-response"),
+    ip,
+    env.TURNSTILE_SECRET,
+  );
+  if (!passed) {
+    return json(400, { ok: false, error: "challenge_failed" });
+  }
 
+  // Collect, trim, cap.
+  const data = {};
+  let total = 0;
+  for (const key of [...REQUIRED, ...OPTIONAL]) {
+    let v = (form.get(key) ?? "").toString().trim();
+    if (v.length > MAX_FIELD) v = v.slice(0, MAX_FIELD);
+    total += v.length;
+    data[key] = v;
+  }
+  if (total > MAX_TOTAL) {
+    return json(413, { ok: false, error: "too_large" });
+  }
+  for (const key of REQUIRED) {
+    if (!data[key]) return json(422, { ok: false, error: "missing_fields" });
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data["Your Email"])) {
+    return json(422, { ok: false, error: "bad_email" });
+  }
+
+  const bodyText = [
+    `Name:             ${data["Your Name"]}`,
+    `Email:            ${data["Your Email"]}`,
+    `Business:         ${data["Business Name"]}`,
+    `Industry:         ${data["Industry"]}`,
+    `Location:         ${data["Location"]}`,
+    `Time in business: ${data["Time In Business"]}`,
+    `Revenue:          ${data["Revenue"] || "—"}`,
+    `Women-owned:      ${data["Women-Owned"] || "—"}`,
+    "",
+    "Goal:",
+    data["Goal"],
+    "",
+    "Anything else:",
+    data["More Info"] || "—",
+    "",
+    "— submitted via the thegrantkey.com contact form",
+  ].join("\n");
+
+  try {
     const mime = createMimeMessage();
     mime.setSender({ name: "The Grant Key form", addr: env.FROM_ADDRESS });
     mime.setRecipient(env.CONTACT_TO);
     mime.setSubject(`New Grant Key inquiry — ${data["Your Name"]}`.slice(0, 200));
-    mime.setHeader("Reply-To", data["Your Email"]);
+    mime.setHeader("Reply-To", new Mailbox(data["Your Email"]));
     mime.addMessage({ contentType: "text/plain", data: bodyText });
 
-    try {
-      await env.CONTACT_EMAIL.send(
-        new EmailMessage(env.FROM_ADDRESS, env.CONTACT_TO, mime.asRaw()),
-      );
-    } catch (err) {
-      console.error("send failed:", err && err.message);
-      return json(502, { ok: false, error: "send_failed" });
-    }
+    await env.CONTACT_EMAIL.send(
+      new EmailMessage(env.FROM_ADDRESS, env.CONTACT_TO, mime.asRaw()),
+    );
+  } catch (err) {
+    console.error("send failed:", err && err.message);
+    return json(502, { ok: false, error: "send_failed" });
+  }
 
-    return json(200, { ok: true });
-  },
-};
+  return json(200, { ok: true });
+}

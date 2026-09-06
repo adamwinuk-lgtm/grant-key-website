@@ -17,10 +17,15 @@ Confirm the address you want form mail delivered to is listed and **Verified**
 (this is almost certainly the same address `hello@thegrantkey.com` already
 forwards to).
 
-In `wrangler.toml`, put that address in **both** places:
+This address is **not** stored in the repo — it goes in as a secret:
 
-- `CONTACT_TO` under `[vars]`
-- `destination_address` in the `send_email` binding
+```sh
+npx wrangler secret put CONTACT_TO      # enter the verified address
+```
+
+The `send_email` binding in `wrangler.toml` is left unrestricted so the address
+stays out of this public file; it can still only deliver to a verified
+destination address, and the code only ever sends to `CONTACT_TO`.
 
 `FROM_ADDRESS` (`form@thegrantkey.com`) does not need to be a real mailbox.
 

@@ -13,20 +13,20 @@ routes = [
   { pattern = "thegrantkey.com/api/contact", zone_name = "thegrantkey.com" }
 ]
 
+# Cloudflare Email Routing send binding (TOP-LEVEL — must not sit under [vars]).
+# Left unrestricted so the recipient address stays out of this public file; it
+# can still only deliver to a VERIFIED destination address on the account, and
+# the code only ever sends to the CONTACT_TO secret.
+send_email = [
+  { name = "CONTACT_EMAIL" }
+]
+
 [vars]
 # "From" address on outgoing mail. Does NOT need to be a real mailbox — it just
 # has to be on thegrantkey.com (SPF already authorises _spf.mx.cloudflare.net).
 FROM_ADDRESS = "form@thegrantkey.com"
 
-# Where form submissions are emailed. MUST be a VERIFIED address under
-# Cloudflare dashboard -> Email -> Email Routing -> Destination addresses,
-# and MUST match the send_email destination_address below.
-CONTACT_TO = "REPLACE_WITH_VERIFIED_EMAIL"
-
-# Cloudflare Email Routing send binding (restricted to the one address).
-send_email = [
-  { name = "CONTACT_EMAIL", destination_address = "REPLACE_WITH_VERIFIED_EMAIL" }
-]
-
-# Secrets (NOT stored here) — set once with:
-#   npx wrangler secret put TURNSTILE_SECRET
+# Secrets / private values (NOT stored here) — set once each with:
+#   npx wrangler secret put TURNSTILE_SECRET   (Turnstile secret key)
+#   npx wrangler secret put CONTACT_TO         (verified Email Routing address
+#                                               that submissions are sent to)

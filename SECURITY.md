@@ -97,9 +97,13 @@ party. Spam is filtered by Cloudflare Turnstile + a honeypot.
 - [x] Worker written (`worker/src/index.js`) — origin check, honeypot,
       Turnstile verification, field validation + size caps, one plain-text
       email via the Email Routing `send_email` binding.
-- [ ] Deploy it: set `CONTACT_TO` / `destination_address` to a verified Email
-      Routing address, create a Turnstile widget, `wrangler secret put
-      TURNSTILE_SECRET`, `wrangler deploy` (see `worker/README.md`).
+- [x] **Deployed** — `grantkey-contact` on route `thegrantkey.com/api/contact`.
+      Turnstile widget created (Managed). `TURNSTILE_SECRET` and `CONTACT_TO`
+      (verified Email Routing address) held as Worker secrets, not in the repo;
+      the `send_email` binding is left unrestricted so no address is committed.
+      Behaviour verified against the live route (405 / 403 / 400 for the reject
+      paths; end-to-end send confirmed with a Turnstile test key, then the real
+      key restored).
 - [ ] Re-enable the form (un-park the `<template>`), point it at `/api/contact`,
       add the Turnstile widget with the site key, update CSP
       (`+challenges.cloudflare.com`, `-formspree.io`).
