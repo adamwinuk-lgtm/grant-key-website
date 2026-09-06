@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://formspree.io; form-action https://formspree.io; base-uri 'self'; frame-ancestors 'none'; object-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>The Grant Key — Grant matching for women-owned businesses</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -129,6 +131,9 @@ nav .wrap{display:flex; align-items:center; justify-content:space-between; paddi
 .form-status{margin-top:16px; font-size:0.95rem; min-height:1.2em;}
 .form-status.success{color:var(--moss);}
 .form-status.error{color:var(--rust);}
+.consent-row{display:flex; gap:10px; align-items:flex-start; margin:8px 0 4px; font-size:0.9rem; color:var(--parchment-dim);}
+.consent-row input{width:auto; margin-top:3px; flex-shrink:0;}
+.consent-row label{font-weight:400; margin:0;}
 .contact-links-secondary{margin-top:22px; font-size:0.9rem;}
 
 footer{padding:40px 0; border-top:0.5px solid var(--vault-3); text-align:center;}
@@ -152,18 +157,18 @@ footer p{font-size:0.85rem;}
 
 <nav>
   <div class="wrap">
-    <button class="brand brand-link" onclick="goTo('home')" aria-label="Go to home page">
+    <button class="brand brand-link" data-goto="home" aria-label="Go to home page">
       <svg viewBox="0 0 24 24" fill="none"><circle cx="7" cy="12" r="4" stroke="#A6791F" stroke-width="1.6"/><line x1="11" y1="12" x2="20" y2="12" stroke="#A6791F" stroke-width="1.6" stroke-linecap="round"/><line x1="16" y1="12" x2="16" y2="16" stroke="#A6791F" stroke-width="1.6" stroke-linecap="round"/><line x1="19" y1="12" x2="19" y2="15" stroke="#A6791F" stroke-width="1.6" stroke-linecap="round"/></svg>
       The Grant Key
     </button>
-    <button class="menu-btn" onclick="document.getElementById('navlinks').classList.toggle('open')">☰</button>
+    <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">☰</button>
     <ul class="navlinks" id="navlinks">
-      <li><button class="navbtn active" data-page="home" onclick="goTo('home')">Home</button></li>
-      <li><button class="navbtn" data-page="help" onclick="goTo('help')">How I Help You</button></li>
-      <li><button class="navbtn" data-page="about" onclick="goTo('about')">About Me</button></li>
-      <li><button class="navbtn" data-page="resources" onclick="goTo('resources')">Grant Resources</button></li>
-      <li><button class="navbtn" data-page="pricing" onclick="goTo('pricing')">Pricing</button></li>
-      <li><button class="navbtn" data-page="contact" onclick="goTo('contact')">Get In Touch</button></li>
+      <li><button class="navbtn active" data-page="home">Home</button></li>
+      <li><button class="navbtn" data-page="help">How I Help You</button></li>
+      <li><button class="navbtn" data-page="about">About Me</button></li>
+      <li><button class="navbtn" data-page="resources">Grant Resources</button></li>
+      <li><button class="navbtn" data-page="pricing">Pricing</button></li>
+      <li><button class="navbtn" data-page="contact">Get In Touch</button></li>
     </ul>
   </div>
 </nav>
@@ -184,8 +189,8 @@ footer p{font-size:0.85rem;}
       <span class="eyebrow">Local · Student-Run · Flat-Fee</span>
       <h1>Every Business Deserves The Keys To Grow.</h1>
       <p>I research and match women-owned businesses with real grants they qualify for — then help make the application easy. One flat fee for my time. Never a percentage of what you receive.</p>
-      <button class="btn" onclick="goTo('contact')">Set up a call</button>
-      <button class="btn-ghost" onclick="goTo('resources')">See grant resources</button>
+      <button class="btn" data-goto="contact">Set up a call</button>
+      <button class="btn-ghost" data-goto="resources">See grant resources</button>
     </div>
   </section>
 
@@ -215,8 +220,8 @@ footer p{font-size:0.85rem;}
           <p>I help you organize your story and tighten your application — in your own words, not a template.</p>
         </div>
       </div>
-      <p style="margin-top:32px;"><a href="#" onclick="goTo('resources'); return false;">See the full grant resources breakdown →</a></p>
-      <p style="margin-top:12px;"><a href="#" onclick="goTo('pricing'); return false;">See how pricing works →</a></p>
+      <p style="margin-top:32px;"><a href="#" data-goto="resources">See the full grant resources breakdown →</a></p>
+      <p style="margin-top:12px;"><a href="#" data-goto="pricing">See how pricing works →</a></p>
     </div>
   </section>
 </div>
@@ -267,7 +272,7 @@ footer p{font-size:0.85rem;}
           <p>If I don't think you qualify for something, or think your odds are genuinely low, I'll say so directly instead of encouraging you to spend hours on a long shot.</p>
         </div>
       </div>
-      <p style="margin-top:30px;">For the full picture of what I'm <em>not</em> able to do, see the "What I Don't Do" section on the <a href="#" onclick="goTo('resources'); return false;">Grant Resources page</a>.</p>
+      <p style="margin-top:30px;">For the full picture of what I'm <em>not</em> able to do, see the "What I Don't Do" section on the <a href="#" data-goto="resources">Grant Resources page</a>.</p>
     </div>
   </section>
 </div>
@@ -432,7 +437,7 @@ footer p{font-size:0.85rem;}
       <h2 style="margin-top:60px;">What I Don't Do</h2>
       <div class="catch-box" style="border-left-color:var(--moss); margin-top:24px;">
         <h3 style="color:var(--moss);">Being Upfront About The Limits Of This Service</h3>
-        <p>I'm a high school student, not a licensed grant writer, financial advisor, or attorney — nothing here is professional or legal advice. I don't write or submit your full application for you; I help you research, match, and organize what you write yourself, in your own words. I can't guarantee funding — no one honestly can — only that we're applying to programs you're genuinely eligible for. I don't handle legal paperwork, taxes, or business registration, and I never take a percentage of anything you receive — just a flat fee for my time, explained on the <a href="#" onclick="goTo('pricing'); return false;">Pricing page</a>. If something falls outside what I can help with, I'll say so directly and point you toward someone qualified.</p>
+        <p>I'm a high school student, not a licensed grant writer, financial advisor, or attorney — nothing here is professional or legal advice. I don't write or submit your full application for you; I help you research, match, and organize what you write yourself, in your own words. I can't guarantee funding — no one honestly can — only that we're applying to programs you're genuinely eligible for. I don't handle legal paperwork, taxes, or business registration, and I never take a percentage of anything you receive — just a flat fee for my time, explained on the <a href="#" data-goto="pricing">Pricing page</a>. If something falls outside what I can help with, I'll say so directly and point you toward someone qualified.</p>
       </div>
     </div>
   </section>
@@ -501,7 +506,8 @@ footer p{font-size:0.85rem;}
       <div class="contact-box">
         <p>Tell me a bit about your business and I'll follow up with grants you're likely eligible for — usually within a few days.</p>
 
-        <form class="contact-form" id="contactForm" action="https://formspree.io/f/REPLACE_WITH_YOUR_FORM_ID" method="POST" onsubmit="return submitContactForm(event)">
+        <!-- action: replace YOUR_FORM_ID with the real Formspree form ID before this goes live -->
+        <form class="contact-form" id="contactForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
           <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
           <input type="hidden" name="_subject" value="New Grant Key inquiry">
 
@@ -576,6 +582,11 @@ footer p{font-size:0.85rem;}
             <textarea id="cf-more" name="More Info" placeholder="Optional"></textarea>
           </div>
 
+          <div class="consent-row">
+            <input type="checkbox" id="cf-consent" name="Consent" value="Agreed to Privacy Policy" required>
+            <label for="cf-consent">I understand my details will be emailed to The Grant Key and stored to follow up about grants, as described in the <a href="#" data-goto="privacy">Privacy Policy</a>. *</label>
+          </div>
+
           <div style="text-align:center; margin-top:8px;">
             <button type="submit" class="btn" id="cf-submit">Unlock My Grant Matches</button>
           </div>
@@ -588,6 +599,60 @@ footer p{font-size:0.85rem;}
   </section>
 </div>
 
+<!-- PRIVACY -->
+<div class="page" data-page="privacy">
+  <div class="page-header">
+    <div class="wrap">
+      <span class="eyebrow">Privacy Policy</span>
+      <h1>What I Collect, And What I Do With It</h1>
+      <p>Plain language, no surprises. Last updated 5 September 2026.</p>
+    </div>
+  </div>
+
+  <section class="tight">
+    <div class="wrap">
+      <div class="ask-list">
+        <div class="ask-item">
+          <h3>Who runs this site</h3>
+          <p>The Grant Key is a small, student-run service operated by Artemis, based in Irvine, California. Questions about your data can go to <a href="mailto:hello@thegrantkey.com">hello@thegrantkey.com</a>.</p>
+        </div>
+        <div class="ask-item">
+          <h3>What I collect</h3>
+          <p>Only what you type into the contact form: your name, email, business name, industry, city and state, how long you've owned the business, what you're hoping funding helps with, and — optionally — rough revenue, women-owned status, and anything else you choose to share. There are no analytics or advertising trackers on this site.</p>
+        </div>
+        <div class="ask-item">
+          <h3>How the form works</h3>
+          <p>The form is handled by Formspree (formspree.io), a third-party service that receives your submission and emails it to me. Your data passes through and is stored by Formspree under their privacy policy, and is delivered to my email inbox. A hidden anti-spam field and a spam filter are used to block automated abuse.</p>
+        </div>
+        <div class="ask-item">
+          <h3>Hosting and standard logs</h3>
+          <p>The site is hosted on GitHub Pages and served through Cloudflare. Like almost any website, their servers automatically log basic request data (such as IP address and browser type) for security and reliability. Web fonts are loaded from Google Fonts, which means Google receives your IP address when the page loads.</p>
+        </div>
+        <div class="ask-item">
+          <h3>How I use your information</h3>
+          <p>To research grants you may be eligible for, to reply to you, and to keep track of our conversation if you decide to work with me. I don't sell it, rent it, or share it with anyone beyond the services named above.</p>
+        </div>
+        <div class="ask-item">
+          <h3>How long I keep it</h3>
+          <p>I keep form submissions and related email only as long as needed to help you or to answer follow-up questions, then delete them. You can ask me to delete your information at any time and I'll do it promptly.</p>
+        </div>
+        <div class="ask-item">
+          <h3>Your choices</h3>
+          <p>Email <a href="mailto:hello@thegrantkey.com">hello@thegrantkey.com</a> to see what I hold about you, correct it, or have it deleted. If you're in California, you have these rights under the CCPA; I don't sell personal information.</p>
+        </div>
+        <div class="ask-item">
+          <h3>Children</h3>
+          <p>This service is intended for adults running or starting a business. It is not directed at children, and I don't knowingly collect information from anyone under 13.</p>
+        </div>
+        <div class="ask-item">
+          <h3>Changes</h3>
+          <p>If this policy changes, the "last updated" date above will change with it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
 <footer>
   <div class="wrap">
     <div class="brand">
@@ -595,77 +660,11 @@ footer p{font-size:0.85rem;}
       The Grant Key
     </div>
     <p>Built by a student who believes every business deserves a fair shot at the funding it's earned.</p>
+    <p style="margin-top:10px;"><a href="#" data-goto="privacy">Privacy Policy</a></p>
   </div>
 </footer>
 
-<script>
-  function goTo(pageName){
-    document.querySelectorAll('.page').forEach(function(p){
-      p.classList.toggle('active', p.getAttribute('data-page') === pageName);
-    });
-    document.querySelectorAll('.navbtn').forEach(function(b){
-      b.classList.toggle('active', b.getAttribute('data-page') === pageName);
-    });
-    document.getElementById('navlinks').classList.remove('open');
-    window.scrollTo(0, 0);
-    initReveal();
-  }
-
-  function submitContactForm(event){
-    event.preventDefault();
-    var form = document.getElementById('contactForm');
-    var status = document.getElementById('cf-status');
-    var submitBtn = document.getElementById('cf-submit');
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending…';
-    status.textContent = '';
-    status.className = 'form-status';
-
-    fetch(form.action, {
-      method: 'POST',
-      body: new FormData(form),
-      headers: {'Accept': 'application/json'}
-    }).then(function(res){
-      if(res.ok){
-        status.textContent = "Thanks — I've got your info and will follow up within a few days.";
-        status.className = 'form-status success';
-        form.reset();
-      } else {
-        throw new Error('submission failed');
-      }
-    }).catch(function(){
-      status.textContent = 'Something went wrong sending that — please email hello@thegrantkey.com directly instead.';
-      status.className = 'form-status error';
-    }).finally(function(){
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Unlock My Grant Matches';
-    });
-
-    return false;
-  }
-
-  var revealObserver = new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if(entry.isIntersecting){
-        entry.target.classList.add('in-view');
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  }, {threshold:0.15});
-
-  function initReveal(){
-    var selector = '.step-card, .grant-card, .ask-item, .fund-col, .catch-box, .alert-box, .contact-box, .local-note, .about-wrap, .trust-note';
-    document.querySelector('.page.active').querySelectorAll(selector).forEach(function(el){
-      if(!el.classList.contains('reveal')){
-        el.classList.add('reveal');
-      }
-      revealObserver.observe(el);
-    });
-  }
-
-  initReveal();
-</script>
+<script src="assets/app.js" defer></script>
 
 </body>
 </html>
