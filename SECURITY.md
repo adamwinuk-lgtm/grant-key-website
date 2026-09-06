@@ -11,8 +11,9 @@ one-person student project; expect a reply within a few days.
   no build step, no dependencies.
 - Served by **GitHub Pages** (`CNAME`, `.nojekyll`), proxied through
   **Cloudflare** at `thegrantkey.com`.
-- The contact form posts to **Formspree**, which emails submissions to
-  `hello@thegrantkey.com`.
+- The contact form is **currently disabled** — its markup is parked in an inert
+  `<template>` in `index.html` and collects nothing. When re-enabled it will post
+  to **Formspree**, which emails submissions to `hello@thegrantkey.com`.
 
 The real risk is takeover of the GitHub, Cloudflare, registrar, or Formspree
 accounts — not code injection. The checklist below reflects that.
@@ -25,9 +26,13 @@ accounts — not code injection. The checklist below reflects that.
       connect/form-action locked down). A stronger copy should also be sent as an
       HTTP header from Cloudflare (see below).
 - [x] `referrer` meta set to `strict-origin-when-cross-origin`.
-- [x] Contact form has a required consent checkbox linking to the Privacy Policy.
-- [x] Honeypot (`_gotcha`) field on the form.
-- [ ] **Replace `YOUR_FORM_ID`** in the form `action` with the real Formspree ID.
+- [x] Contact form **disabled** pending backend + inbox setup — parked in an
+      inert `<template id="contactFormMarkup">`, so no personal data is collected.
+      Privacy Policy page notes this.
+- [x] Form markup keeps a required consent checkbox and a honeypot (`_gotcha`)
+      for when it is re-enabled.
+- [ ] Before re-enabling: work through the **Formspree** section below and
+      replace `YOUR_FORM_ID` in the form `action` with the real form ID.
 
 ## Cloudflare (edge) — set in the dashboard or via API
 
