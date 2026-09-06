@@ -1,0 +1,32 @@
+# The Grant Key — contact form Worker
+# Deploy:  cd worker && npm install && npx wrangler deploy
+# See README.md for the full setup (Turnstile, verified email address).
+
+name = "grantkey-contact"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+workers_dev = false
+
+# Intercept ONLY the form endpoint. Every other path on the domain continues
+# to be served by GitHub Pages.
+routes = [
+  { pattern = "thegrantkey.com/api/contact", zone_name = "thegrantkey.com" }
+]
+
+[vars]
+# "From" address on outgoing mail. Does NOT need to be a real mailbox — it just
+# has to be on thegrantkey.com (SPF already authorises _spf.mx.cloudflare.net).
+FROM_ADDRESS = "form@thegrantkey.com"
+
+# Where form submissions are emailed. MUST be a VERIFIED address under
+# Cloudflare dashboard -> Email -> Email Routing -> Destination addresses,
+# and MUST match the send_email destination_address below.
+CONTACT_TO = "REPLACE_WITH_VERIFIED_EMAIL"
+
+# Cloudflare Email Routing send binding (restricted to the one address).
+send_email = [
+  { name = "CONTACT_EMAIL", destination_address = "REPLACE_WITH_VERIFIED_EMAIL" }
+]
+
+# Secrets (NOT stored here) — set once with:
+#   npx wrangler secret put TURNSTILE_SECRET
