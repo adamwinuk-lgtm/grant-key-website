@@ -11,10 +11,10 @@ one-person student project; expect a reply within a few days.
   no build step, no dependencies.
 - Served by **GitHub Pages** (`CNAME`, `.nojekyll`), proxied through
   **Cloudflare** at `thegrantkey.com`.
-- The contact form is **currently disabled** — its markup is parked in an inert
-  `<template>` in `index.html` and collects nothing. When re-enabled it will post
-  same-origin to a Cloudflare Worker (`worker/`) that emails submissions to a
-  verified address via Email Routing (see "Contact form backend" below).
+- The contact form posts same-origin to a Cloudflare Worker (`worker/`) on
+  `/api/contact`, which verifies a Cloudflare Turnstile challenge and emails the
+  submission to a verified address via Email Routing. Nothing is stored (see
+  "Contact form backend" below).
 
 The real risk is takeover of the GitHub or Cloudflare account (Cloudflare also
 holds the registrar and DNS) — not code injection. The checklist reflects that.
@@ -23,19 +23,16 @@ holds the registrar and DNS) — not code injection. The checklist reflects that
 
 - [x] No inline JavaScript or inline event handlers — all script is in
       `assets/app.js`, loaded with `script-src 'self'`.
-- [x] `Content-Security-Policy` meta tag in `index.html` (script/style/img/font/
-      connect/form-action locked down). A stronger copy should also be sent as an
-      HTTP header from Cloudflare (see below).
+- [x] `Content-Security-Policy` meta tag in `index.html`. A copy is also sent as
+      an HTTP header from Cloudflare (adds `frame-ancestors`); keep the two in
+      sync. Current policy allows only `'self'` plus `challenges.cloudflare.com`
+      (Turnstile) for script/frame/connect; `form-action 'self'`.
 - [x] `referrer` meta set to `strict-origin-when-cross-origin`.
 - [x] Fonts self-hosted from `assets/fonts/` — no Google Fonts, no third-party
       CDN. CSP `style-src`/`font-src` are `'self'` only.
-- [x] Contact form **disabled** pending backend + inbox setup — parked in an
-      inert `<template id="contactFormMarkup">`, so no personal data is collected.
-      Privacy Policy page notes this.
-- [x] Form markup keeps a required consent checkbox and a honeypot (`_gotcha`)
-      for when it is re-enabled.
-- [ ] Before re-enabling: deploy the Worker and wire the form to it — see
-      "Contact form backend" below.
+- [x] Contact form posts to the same-origin Worker at `/api/contact` with a
+      required consent checkbox, a honeypot (`_gotcha`), and a Cloudflare
+      Turnstile widget. No data is stored client- or server-side.
 
 ## Cloudflare (edge)
 
@@ -50,8 +47,8 @@ holds the registrar and DNS) — not code injection. The checklist reflects that
       `Permissions-Policy: geolocation=(), camera=(), microphone=()`, and a
       `Content-Security-Policy` (adds `frame-ancestors 'none'` on top of the
       meta tag). `X-Content-Type-Options: nosniff` comes from the HSTS setting.
-      **Re-sync this header after the self-hosted-fonts change** — new value:
-      `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://formspree.io; form-action https://formspree.io; base-uri 'self'; frame-ancestors 'none'; object-src 'none'`
+      Current value (keep in sync with the `index.html` meta tag):
+      `default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; form-action 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'`
 - [x] **Bot Fight Mode** = On; Free Managed WAF ruleset on by default.
 - [x] Rate-limit rule: ~100 req / 10s / IP, action Block (Free-plan fixed 10s),
       match `http.host` in {`thegrantkey.com`, `www.thegrantkey.com`}.
@@ -104,9 +101,10 @@ party. Spam is filtered by Cloudflare Turnstile + a honeypot.
       Behaviour verified against the live route (405 / 403 / 400 for the reject
       paths; end-to-end send confirmed with a Turnstile test key, then the real
       key restored).
-- [ ] Re-enable the form (un-park the `<template>`), point it at `/api/contact`,
-      add the Turnstile widget with the site key, update CSP
-      (`+challenges.cloudflare.com`, `-formspree.io`).
+- [x] Form live: un-parked in `index.html`, `action="/api/contact"`, Turnstile
+      widget added, `assets/app.js` handles the JSON response, CSP updated in the
+      meta tag (mirror it in the Cloudflare response-header rule — value above).
+      Formspree hidden fields removed; honeypot + consent checkbox kept.
 
 ## History note
 
