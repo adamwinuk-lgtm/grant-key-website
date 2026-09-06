@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://formspree.io; form-action https://formspree.io; base-uri 'self'; frame-ancestors 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; form-action 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>The Grant Key — Grant matching for women-owned businesses</title>
 <link rel="stylesheet" href="assets/fonts.css">
@@ -502,25 +502,10 @@ footer p{font-size:0.85rem;}
   <section class="tight">
     <div class="wrap">
       <div class="contact-box">
-        <p>The intake form is temporarily offline while I finish setting it up securely. Please check back soon — thanks for your patience.</p>
-      </div>
-
-      <!--
-        CONTACT FORM — TEMPORARILY DISABLED.
-        The form backend (Formspree) and the hello@thegrantkey.com inbox are not
-        set up yet, so the form is parked in this inert <template> and collects
-        nothing. To re-enable: (1) delete the holding <p> and its </div> above,
-        (2) remove this comment and the <template ...> / </template> wrapper lines,
-        (3) put the intro <p>, the form, and the email line back inside
-        <div class="contact-box">, (4) replace YOUR_FORM_ID with the real
-        Formspree form ID. See SECURITY.md for the full re-enable checklist.
-      -->
-      <template id="contactFormMarkup">
         <p>Tell me a bit about your business and I'll follow up with grants you're likely eligible for — usually within a few days.</p>
 
-        <form class="contact-form" id="contactForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <form class="contact-form" id="contactForm" action="/api/contact" method="POST">
           <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
-          <input type="hidden" name="_subject" value="New Grant Key inquiry">
 
           <div class="form-row">
             <div class="form-group">
@@ -595,8 +580,10 @@ footer p{font-size:0.85rem;}
 
           <div class="consent-row">
             <input type="checkbox" id="cf-consent" name="Consent" value="Agreed to Privacy Policy" required>
-            <label for="cf-consent">I understand my details will be emailed to The Grant Key and stored to follow up about grants, as described in the <a href="#" data-goto="privacy">Privacy Policy</a>. *</label>
+            <label for="cf-consent">I understand my details will be emailed to The Grant Key so they can follow up about grants, as described in the <a href="#" data-goto="privacy">Privacy Policy</a>. *</label>
           </div>
+
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAAEqe5eLgVyeJmlv6" data-theme="light" style="margin:16px 0;"></div>
 
           <div style="text-align:center; margin-top:8px;">
             <button type="submit" class="btn" id="cf-submit">Unlock My Grant Matches</button>
@@ -605,7 +592,7 @@ footer p{font-size:0.85rem;}
         </form>
 
         <p class="contact-links-secondary">Prefer email? Reach me directly at <a href="mailto:hello@thegrantkey.com">hello@thegrantkey.com</a></p>
-      </template>
+      </div>
     </div>
   </section>
 </div>
@@ -616,7 +603,7 @@ footer p{font-size:0.85rem;}
     <div class="wrap">
       <span class="eyebrow">Privacy Policy</span>
       <h1>What I Collect, And What I Do With It</h1>
-      <p>Plain language, no surprises. Last updated 5 September 2026.</p>
+      <p>Plain language, no surprises. Last updated 6 September 2026.</p>
     </div>
   </div>
 
@@ -629,11 +616,12 @@ footer p{font-size:0.85rem;}
         </div>
         <div class="ask-item">
           <h3>What I collect</h3>
-          <p><strong>The contact form is switched off right now, so no form data is being collected.</strong> When it's active, it collects only what you type into it: your name, email, business name, industry, city and state, how long you've owned the business, what you're hoping funding helps with, and — optionally — rough revenue, women-owned status, and anything else you choose to share. There are no analytics or advertising trackers on this site.</p>
+          <p>Only what you type into the contact form: your name, email, business name, industry, city and state, how long you've owned the business, what you're hoping funding helps with, and — optionally — rough revenue, women-owned status, and anything else you choose to share. There are no analytics or advertising trackers on this site.</p>
         </div>
         <div class="ask-item">
           <h3>How the form works</h3>
-          <p>The form is handled by Formspree (formspree.io), a third-party service that receives your submission and emails it to me. Your data passes through and is stored by Formspree under their privacy policy, and is delivered to my email inbox. A hidden anti-spam field and a spam filter are used to block automated abuse.</p>
+          <p>When you submit the form it goes to a small program running on this site's own domain (a Cloudflare Worker). That program checks an anti-spam challenge, then emails your details straight to my inbox and forgets them — nothing is written to a database or kept anywhere else. There is no third-party form service.</p>
+          <p style="margin-top:10px;">The anti-spam challenge is Cloudflare Turnstile — a privacy-focused alternative to reCAPTCHA. It runs a quick check in your browser to confirm you're a person and does not track you across other sites. There is also a hidden field that only automated bots fill in.</p>
         </div>
         <div class="ask-item">
           <h3>Hosting and standard logs</h3>
@@ -675,6 +663,7 @@ footer p{font-size:0.85rem;}
   </div>
 </footer>
 
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script src="assets/app.js" defer></script>
 
 </body>
