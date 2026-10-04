@@ -23,14 +23,35 @@ const MAX_TOTAL = 20000; // whole-payload character cap
 const REQUIRED = [
   "Your Name",
   "Your Email",
+  "Phone",
+  "Role",
   "Business Name",
   "Industry",
+  "Website",
+  "Products/Services",
+  "Street Address",
   "Location",
+  "Business Structure",
   "Time In Business",
+  "Women-Owned",
   "Goal",
+  "Challenges",
+  "Impact",
+  "Revenue",
   "Consent",
 ];
-const OPTIONAL = ["Revenue", "Women-Owned", "More Info"];
+const OPTIONAL = [
+  "Age Range",
+  "Gender",
+  "Racial/Ethnic Identity",
+  "Social Media",
+  "Momentum",
+  "Community & Differentiator",
+  "More Info",
+];
+// Checkbox groups: multiple form fields share one name, so each can appear
+// more than once in the submitted FormData. Read with getAll(), not get().
+const MULTI = ["Identity Factors", "Outside Funding"];
 
 function json(status, obj) {
   return new Response(JSON.stringify(obj), {
@@ -116,6 +137,16 @@ async function handle(request, env) {
     total += v.length;
     data[key] = v;
   }
+  for (const key of MULTI) {
+    let v = form
+      .getAll(key)
+      .map((x) => x.toString().trim())
+      .filter(Boolean)
+      .join(", ");
+    if (v.length > MAX_FIELD) v = v.slice(0, MAX_FIELD);
+    total += v.length;
+    data[key] = v;
+  }
   if (total > MAX_TOTAL) {
     return json(413, { ok: false, error: "too_large" });
   }
@@ -127,17 +158,47 @@ async function handle(request, env) {
   }
 
   const bodyText = [
+    "--- Contact ---",
     `Name:             ${data["Your Name"]}`,
     `Email:            ${data["Your Email"]}`,
-    `Business:         ${data["Business Name"]}`,
-    `Industry:         ${data["Industry"]}`,
-    `Location:         ${data["Location"]}`,
-    `Time in business: ${data["Time In Business"]}`,
-    `Revenue:          ${data["Revenue"] || "—"}`,
-    `Women-owned:      ${data["Women-Owned"] || "—"}`,
+    `Phone:            ${data["Phone"]}`,
+    `Role:             ${data["Role"]}`,
+    `Age range:        ${data["Age Range"] || "—"}`,
+    `Gender:           ${data["Gender"] || "—"}`,
+    `Racial/ethnic id: ${data["Racial/Ethnic Identity"] || "—"}`,
+    `Other identity:   ${data["Identity Factors"] || "—"}`,
     "",
+    "--- Business ---",
+    `Business:         ${data["Business Name"]}`,
+    `Website:          ${data["Website"]}`,
+    `Social media:     ${data["Social Media"] || "—"}`,
+    `Industry:         ${data["Industry"]}`,
+    `Address:          ${data["Street Address"]}`,
+    `Location:         ${data["Location"]}`,
+    `Structure:        ${data["Business Structure"]}`,
+    `Time in business: ${data["Time In Business"]}`,
+    `Women-owned 51%+: ${data["Women-Owned"]}`,
+    `Revenue (12mo):   ${data["Revenue"]}`,
+    `Outside funding:  ${data["Outside Funding"] || "—"}`,
+    "",
+    "Products/services:",
+    data["Products/Services"],
+    "",
+    "--- Funding & Goals ---",
     "Goal:",
     data["Goal"],
+    "",
+    "Challenges:",
+    data["Challenges"],
+    "",
+    "Momentum:",
+    data["Momentum"] || "—",
+    "",
+    "Community & differentiator:",
+    data["Community & Differentiator"] || "—",
+    "",
+    "Impact:",
+    data["Impact"],
     "",
     "Anything else:",
     data["More Info"] || "—",

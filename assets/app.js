@@ -73,7 +73,7 @@
       });
     }).then(function (result) {
       if (result.ok) {
-        status.textContent = "Thanks — I've got your info and will follow up within a few days.";
+        status.textContent = "Thanks — we've got your info and will follow up within a few days.";
         status.className = 'form-status success';
         form.reset();
       } else if (result.error === 'challenge_failed') {
